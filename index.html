@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasalFabrikası 🪄 - Açık Kaynak Çocuk Kitabı Tasarımcısı</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Comfortaa for playful book typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        comfortaa: ['Comfortaa', 'cursive'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelPink: '#FFF0F5',
+                        pastelBlue: '#F0F8FF',
+                        pastelYellow: '#FFFACD',
+                        pastelMint: '#F0FFF0',
+                        pastelPurple: '#F8F0FF',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .book-binding {
+            background: linear-gradient(90deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.02) 8%, rgba(255,255,255,0.4) 12%, rgba(0,0,0,0.08) 100%);
+        }
+        .real-book-shadow {
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.06);
+        }
+        .page-turn {
+            transition: all 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pastelBlue via-pastelPurple to-pastelPink min-h-screen font-sans text-gray-800 flex flex-col">
+
+    <header class="bg-white/80 backdrop-blur-md border-b border-purple-100 sticky top-0 z-50 shadow-sm print:hidden">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-r from-pink-400 to-purple-500 text-white p-2.5 rounded-2xl shadow-md">
+                    <i class="fa-solid fa-book-open-reader text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-fredoka text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">MasalFabrikası 🪄</h1>
+                    <p class="text-xs text-gray-500 font-medium">Açık Kaynak LLM & Vision AI Destekli Çocuk Kitabı Tasarımcısı</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="flex space-x-2 mt-2 md:mt-0 overflow-x-auto pb-1 md:pb-0">
+                <button onclick="switchTab('creator')" id="tab-creator" class="nav-tab px-4 py-2 rounded-xl font-fredoka text-sm font-semibold transition-all bg-purple-600 text-white shadow-md flex items-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Sayfa Oluştur</span>
+                </button>
+                <button onclick="switchTab('manager')" id="tab-manager" class="nav-tab px-4 py-2 rounded-xl font-fredoka text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-purple-50 shadow-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Kitap Yöneticisi</span>
+                    <span id="page-count-badge" class="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+                <button onclick="switchTab('flipbook')" id="tab-flipbook" class="nav-tab px-4 py-2 rounded-xl font-fredoka text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-purple-50 shadow-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Çift Sayfa Kitap Görünümü</span>
+                </button>
+                <button onclick="switchTab('print')" id="tab-print" class="nav-tab px-4 py-2 rounded-xl font-fredoka text-sm font-semibold transition-all bg-white text-gray-600 hover:bg-purple-50 shadow-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    <span>E-Kitap İndir / Yazdır</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+
+        <!-- ================= TAB 1: PAGE CREATOR ================= -->
+        <div id="view-creator" class="tab-content space-y-6">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-xl border border-purple-100">
+                <div class="text-center max-w-2xl mx-auto mb-8">
+                    <span class="bg-pink-100 text-pink-600 font-fredoka text-xs px-3 py-1 rounded-full uppercase tracking-wider">Açık Kaynak Yapay Zeka Motoru</span>
+                    <h2 class="font-fredoka text-3xl font-bold text-gray-800 mt-2">Sihirli Masal Sayfası Tasarla</h2>
+                    <p class="text-gray-600 text-sm mt-1">Görsel yükleyin, basit bir cümle yazın; Florence-2 görseli analiz etsin ve Llama 3 çocuk diline uygun harika bir masal sayfasına dönüştürsün!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left: Image Upload & Samples -->
+                    <div class="space-y-4">
+                        <label class="block font-fredoka font-semibold text-gray-700">1. Görsel Seçin veya Yükleyin</label>
+                        
+                        <!-- Upload Box -->
+                        <div id="drop-zone" class="border-2 border-dashed border-purple-300 rounded-2xl p-6 text-center bg-purple-50/50 hover:bg-purple-50 transition cursor-pointer relative overflow-hidden group">
+                            <input type="file" id="image-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event)">
+                            <div id="upload-prompt" class="space-y-3">
+                                <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <p class="font-medium text-gray-700">Görseli sürükleyin veya <span class="text-purple-600 underline">dosya seçin</span></p>
+                                <p class="text-xs text-gray-400">PNG, JPG, WEBP (Maks. 5MB)</p>
+                            </div>
+                            <!-- Image Preview inside dropzone -->
+                            <div id="image-preview-container" class="hidden relative">
+                                <img id="preview-img" src="" alt="Yüklenen Görsel" class="max-h-64 mx-auto rounded-xl object-contain shadow-md">
+                                <button type="button" onclick="resetImage(event)" class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow hover:bg-red-600 transition">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sample Images Selection -->
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 mb-2">Veya Hazır Örnek Görsellerden Seçin:</p>
+                            <div class="grid grid-cols-4 gap-2">
+                                <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300&q=80" onclick="selectSampleImage(this.src)" class="h-16 w-full object-cover rounded-xl cursor-pointer hover:opacity-80 border-2 border-transparent hover:border-purple-500 transition shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=300&q=80" onclick="selectSampleImage(this.src)" class="h-16 w-full object-cover rounded-xl cursor-pointer hover:opacity-80 border-2 border-transparent hover:border-purple-500 transition shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=300&q=80" onclick="selectSampleImage(this.src)" class="h-16 w-full object-cover rounded-xl cursor-pointer hover:opacity-80 border-2 border-transparent hover:border-purple-500 transition shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1561948955-570b270e7c36?auto=format&fit=crop&w=300&q=80" onclick="selectSampleImage(this.src)" class="h-16 w-full object-cover rounded-xl cursor-pointer hover:opacity-80 border-2 border-transparent hover:border-purple-500 transition shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Prompt, Settings & AI Transform -->
+                    <div class="space-y-5 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <!-- User Sentence Input -->
+                            <div>
+                                <label class="block font-fredoka font-semibold text-gray-700 mb-1">2. Temel Cümle / Olay</label>
+                                <textarea id="user-sentence" rows="3" placeholder="Örn: Kedi bahçede zıpladı ve kelebeğin peşinden koştu..." class="w-full px-4 py-3 rounded-2xl border border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50/30 text-sm shadow-inner"></textarea>
+                            </div>
+
+                            <!-- AI Style Selector -->
+                            <div>
+                                <label class="block font-fredoka font-semibold text-gray-700 mb-1">3. Yapay Zeka Masal Stili</label>
+                                <select id="ai-style" class="w-full px-4 py-3 rounded-2xl border border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white text-sm shadow-sm font-medium">
+                                    <option value="rhyme">✨ Masalsı & Kafiyeli (Şiirsel ve ritmik)</option>
+                                    <option value="adventure">🚀 Macera Dolu (Heyecanlı ve keşif odaklı)</option>
+                                    <option value="sleepy">🌙 Uyku Öncesi Sakin (Huzurlu ve masalsı)</option>
+                                    <option value="educational">🎨 Eğitici & Eğlenceli (Merak uyandıran ve öğretici)</option>
+                                </select>
+                            </div>
+
+                            <!-- Age Group Selector -->
+                            <div>
+                                <label class="block font-fredoka font-semibold text-gray-700 mb-1">4. Hedef Yaş Grubu</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button type="button" onclick="setAgeGroup('3-5')" id="age-3-5" class="age-btn py-2.5 px-4 rounded-xl border-2 border-purple-400 bg-purple-50 font-fredoka font-medium text-purple-700 text-sm transition shadow-sm">3 - 5 Yaş (Minik Keşifler)</button>
+                                    <button type="button" onclick="setAgeGroup('6-8')" id="age-6-8" class="age-btn py-2.5 px-4 rounded-xl border-2 border-purple-200 bg-white font-fredoka font-medium text-gray-600 text-sm transition hover:border-purple-300 shadow-sm">6 - 8 Yaş (Büyüyen Kaşifler)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transform Button -->
+                        <button onclick="startAiTransformation()" class="w-full mt-4 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-fredoka font-bold rounded-2xl shadow-lg hover:shadow-xl hover:opacity-95 transition transform active:scale-95 flex items-center justify-center space-x-2 text-lg">
+                            <i class="fa-solid fa-wand-magic"></i>
+                            <span>Yapay Zeka ile Dönüştür</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LOADING OVERLAY SIMULATION ================= -->
+        <div id="loading-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl border border-purple-100">
+                <div class="relative w-24 h-24 mx-auto">
+                    <div class="absolute inset-0 rounded-full border-4 border-purple-200 animate-pulse"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-purple-600 border-t-transparent animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center text-purple-600 text-3xl">
+                        <i class="fa-solid fa-robot animate-bounce"></i>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h3 id="loading-step-title" class="font-fredoka text-xl font-bold text-gray-800">Florence-2 Görseli Analiz Ediyor...</h3>
+                    <p id="loading-step-desc" class="text-sm text-gray-500">Nesneler, renkler ve duygular taranıyor ve etiketleniyor.</p>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+                    <div id="loading-progress" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 2: AI RESULT & EDITOR ================= -->
+        <div id="view-result" class="tab-content hidden space-y-6">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-xl border border-purple-100 max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                    <div>
+                        <span class="bg-emerald-100 text-emerald-700 font-fredoka text-xs px-3 py-1 rounded-full uppercase tracking-wider"><i class="fa-solid fa-circle-check"></i> Yapay Zeka Tamamladı</span>
+                        <h2 class="font-fredoka text-2xl font-bold text-gray-800 mt-1">Masal Sayfası Hazır!</h2>
+                    </div>
+                    <button onclick="switchTab('creator')" class="text-sm font-medium text-purple-600 hover:underline flex items-center space-x-1">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Yeni Sayfa Oluştur</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <!-- Preview Image & AI Vision Analysis Badge -->
+                    <div class="space-y-4">
+                        <div class="rounded-2xl overflow-hidden shadow-md border-4 border-purple-100 bg-purple-50">
+                            <img id="result-img" src="" alt="Sayfa Görseli" class="w-full h-72 object-cover">
+                        </div>
+                        <div class="bg-purple-50 rounded-2xl p-4 border border-purple-200/60">
+                            <h4 class="font-fredoka text-xs font-semibold text-purple-700 uppercase mb-1 flex items-center space-x-1">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Florence-2 Görsel Analiz Çıktısı:</span>
+                            </h4>
+                            <p id="result-vision-text" class="text-xs text-gray-600 italic">"Sevimli sarman kedi, güneşli bahçede renkli çiçekler arasında mutlu bir şekilde zıplıyor."</p>
+                        </div>
+                    </div>
+
+                    <!-- Editable AI Fairytale Text -->
+                    <div class="space-y-4 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="font-fredoka font-semibold text-gray-700">Llama 3 ile Düzenlenen Masal Metni:</label>
+                                <span class="text-xs bg-pink-100 text-pink-600 px-2 py-0.5 rounded-md font-medium" id="result-meta-badge">Masalsı & Kafiyeli • 3-5 Yaş</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mb-2">Metni dilediğiniz gibi düzenleyebilir, kelimeleri çocukların seveceği şekilde kişiselleştirebilirsiniz.</p>
+                            <textarea id="result-editable-text" rows="7" class="w-full px-4 py-3 rounded-2xl border border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-amber-50/30 text-gray-800 font-medium text-base shadow-inner leading-relaxed"></textarea>
+                        </div>
+
+                        <div class="pt-4">
+                            <button onclick="addPageToBook()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-fredoka font-bold rounded-2xl shadow-lg hover:shadow-xl hover:opacity-95 transition transform active:scale-95 flex items-center justify-center space-x-2 text-base">
+                                <i class="fa-solid fa-plus-circle text-lg"></i>
+                                <span>Bu Sayfayı Kitaba Ekle</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: BOOK MANAGER ================= -->
+        <div id="view-manager" class="tab-content hidden space-y-6">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-xl border border-purple-100">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-gray-100 gap-4">
+                    <div>
+                        <h2 class="font-fredoka text-2xl font-bold text-gray-800">Kitap Yöneticisi</h2>
+                        <p class="text-sm text-gray-500">Eklediğiniz masal sayfalarını düzenleyin, sıralayın veya silin.</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="switchTab('creator')" class="px-4 py-2 bg-purple-100 text-purple-700 font-fredoka text-sm font-semibold rounded-xl hover:bg-purple-200 transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Sayfa Ekle
+                        </button>
+                        <button onclick="switchTab('flipbook')" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-fredoka text-sm font-semibold rounded-xl shadow hover:opacity-95 transition">
+                            <i class="fa-solid fa-book-open mr-1"></i> Kitabı Oku
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-book-state" class="text-center py-16 space-y-4">
+                    <div class="w-20 h-20 bg-purple-50 text-purple-400 rounded-full flex items-center justify-center mx-auto text-3xl">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                    </div>
+                    <h3 class="font-fredoka text-xl font-bold text-gray-700">Henüz Kitabınızda Sayfa Yok!</h3>
+                    <p class="text-gray-500 text-sm max-w-md mx-auto">"Sayfa Oluştur" sekmesinden ilk görselinizi yükleyin ve yapay zeka ile masalınızı yazmaya başlayın.</p>
+                    <button onclick="switchTab('creator')" class="px-6 py-3 bg-purple-600 text-white font-fredoka font-semibold rounded-2xl shadow hover:bg-purple-700 transition">
+                        İlk Sayfayı Tasarla
+                    </button>
+                </div>
+
+                <!-- Page Grid -->
+                <div id="pages-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 4: FLIPBOOK / REAL BOOK PREVIEW ================= -->
+        <div id="view-flipbook" class="tab-content hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <span class="bg-amber-100 text-amber-800 font-fredoka text-xs px-3 py-1 rounded-full uppercase">Çift Sayfalı Kitap Formatı</span>
+                <h2 class="font-fredoka text-3xl font-bold text-gray-800">Gerçek Çocuk Kitabı Deneyimi</h2>
+                <p class="text-gray-600 text-sm">Masal kitabınızı tıpkı gerçek bir resimli çocuk kitabı gibi sol tarafta resim, sağ tarafta masal metniyle okuyun.</p>
+            </div>
+
+            <!-- Real Book Spread Container -->
+            <div class="max-w-5xl mx-auto">
+                <div class="bg-amber-100/60 rounded-3xl p-4 md:p-8 border-4 border-amber-200/80 real-book-shadow relative min-h-[460px] flex flex-col justify-between">
+                    
+                    <!-- Book Open Spread -->
+                    <div id="flipbook-content" class="flex-grow flex items-center justify-center">
+                        <!-- Dynamic Open Book Spread Rendered Here -->
+                    </div>
+
+                    <!-- Book Controls -->
+                    <div class="flex justify-between items-center mt-6 pt-4 border-t border-amber-200/80">
+                        <button onclick="prevFlipPage()" id="prev-btn" class="px-5 py-2.5 bg-white border border-amber-300 font-fredoka font-semibold text-amber-800 rounded-xl shadow hover:bg-amber-100 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-2">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Önceki Sayfa</span>
+                        </button>
+                        <div class="text-center">
+                            <span id="flip-page-indicator" class="font-fredoka font-bold text-amber-900 text-sm block">Sayfa 0 / 0</span>
+                            <span class="text-[11px] text-amber-700/70 font-medium">MasalFabrikası Çocuk Yayınları</span>
+                        </div>
+                        <button onclick="nextFlipPage()" id="next-btn" class="px-5 py-2.5 bg-amber-600 font-fredoka font-semibold text-white rounded-xl shadow hover:bg-amber-700 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-2">
+                            <span>Sonraki Sayfa</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 5: E-BOOK DOWNLOAD / PRINT ================= -->
+        <div id="view-print" class="tab-content hidden space-y-6">
+            <!-- Header Bar with Actions -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/90 p-5 rounded-2xl shadow-sm border border-purple-100 gap-4 print:hidden">
+                <div>
+                    <h2 class="font-fredoka text-xl font-bold text-gray-800">E-Kitap İndir & PDF / Baskı Al</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Hazırladığınız tüm sayfaları e-Kitap olarak cihazınıza indirebilir veya PDF formatında kaydedebilirsiniz.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="downloadEBook()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-fredoka font-semibold rounded-xl shadow hover:opacity-95 transition flex items-center space-x-2 text-sm">
+                        <i class="fa-solid fa-download"></i>
+                        <span>E-Kitap (.html) İndir</span>
+                    </button>
+                    <button onclick="window.print()" class="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-fredoka font-semibold rounded-xl shadow hover:opacity-95 transition flex items-center space-x-2 text-sm">
+                        <i class="fa-solid fa-print"></i>
+                        <span>PDF / Yazdır</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Complete Book View (All pages sequentially as a finished book) -->
+            <div id="print-container" class="space-y-12 max-w-4xl mx-auto">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 print:hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl border border-purple-100">
+            <div id="modal-icon" class="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-info"></i>
+            </div>
+            <h3 id="modal-title" class="font-fredoka text-xl font-bold text-gray-800">Bilgilendirme</h3>
+            <p id="modal-message" class="text-sm text-gray-600">İşlem başarıyla gerçekleştirildi.</p>
+            <button onclick="closeModal()" class="w-full py-2.5 bg-purple-600 text-white font-fredoka font-semibold rounded-xl shadow hover:bg-purple-700 transition">
+                Tamam
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let bookPages = [];
+        let currentTab = 'creator';
+        let currentSampleImage = '';
+        let uploadedImageBase64 = '';
+        let selectedAge = '3-5';
+        let flipIndex = 0;
+        let tempAiResult = {
+            image: '',
+            visionText: '',
+            transformedText: '',
+            style: '',
+            age: ''
+        };
+
+        // Initialize with default sample pages for immediate preview
+        window.onload = function() {
+            bookPages.push({
+                id: 1,
+                image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80',
+                visionText: 'Sevimli sarman kedi, güneşli bahçede renkli çiçeklerin arasında mutlu bir şekilde duruyor.',
+                text: 'Minik patili sarman kedi Pamuk, her sabah olduğu gibi bahçedeki rengarenk papatyaların arasında neşeyle uyanır.\n\n"Günaydın dünya!" diye mırıldanarak minik kelebekleri selamlar.',
+                style: '✨ Masalsı & Kafiyeli',
+                age: '3-5 Yaş'
+            });
+
+            bookPages.push({
+                id: 2,
+                image: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=600&q=80',
+                visionText: 'Kedi ve sevimli dostu bahçe patikasında birlikte yürüyüş yapıyorlar.',
+                text: 'Yolda en yakın arkadaşı Bıdık ile karşılaşır. Birlikte kocaman ağacın gölgesinde eğlenceli bir oyun oynamaya karar verirler.',
+                style: '🚀 Macera Dolu',
+                age: '3-5 Yaş'
+            });
+
+            updatePageCountBadge();
+            renderBookManager();
+            renderFlipbook();
+            renderPrintView();
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('bg-purple-600', 'text-white', 'shadow-md');
+                el.classList.add('bg-white', 'text-gray-600', 'shadow-sm');
+            });
+
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const activeTabBtn = document.getElementById(`tab-${tabId}`);
+            if (activeTabBtn) {
+                activeTabBtn.classList.remove('bg-white', 'text-gray-600', 'shadow-sm');
+                activeTabBtn.classList.add('bg-purple-600', 'text-white', 'shadow-md');
+            }
+            currentTab = tabId;
+
+            if (tabId === 'manager') renderBookManager();
+            if (tabId === 'flipbook') {
+                flipIndex = 0;
+                renderFlipbook();
+            }
+            if (tabId === 'print') renderPrintView();
+        }
+
+        // Age Group Selector
+        function setAgeGroup(age) {
+            selectedAge = age;
+            document.querySelectorAll('.age-btn').forEach(btn => {
+                btn.classList.remove('border-purple-400', 'bg-purple-50', 'text-purple-700');
+                btn.classList.add('border-purple-200', 'bg-white', 'text-gray-600');
+            });
+            const activeBtn = document.getElementById(`age-${age}`);
+            activeBtn.classList.remove('border-purple-200', 'bg-white', 'text-gray-600');
+            activeBtn.classList.add('border-purple-400', 'bg-purple-50', 'text-purple-700');
+        }
+
+        // Image Handling
+        function selectSampleImage(url) {
+            currentSampleImage = url;
+            uploadedImageBase64 = '';
+            document.getElementById('preview-img').src = url;
+            document.getElementById('upload-prompt').classList.add('hidden');
+            document.getElementById('image-preview-container').classList.remove('hidden');
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageBase64 = e.target.result;
+                    currentSampleImage = '';
+                    document.getElementById('preview-img').src = uploadedImageBase64;
+                    document.getElementById('upload-prompt').classList.add('hidden');
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetImage(e) {
+            e.stopPropagation();
+            uploadedImageBase64 = '';
+            currentSampleImage = '';
+            document.getElementById('image-upload').value = '';
+            document.getElementById('preview-img').src = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('upload-prompt').classList.remove('hidden');
+        }
+
+        // Custom Modal
+        function showModal(title, message, isSuccess = true) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            const iconEl = document.getElementById('modal-icon');
+            if (isSuccess) {
+                iconEl.className = "w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl";
+                iconEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else {
+                iconEl.className = "w-14 h-14 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto text-2xl";
+                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            }
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        // AI Transformation Simulation
+        function startAiTransformation() {
+            const sentence = document.getElementById('user-sentence').value.trim();
+            const imageSrc = uploadedImageBase64 || currentSampleImage;
+            const style = document.getElementById('ai-style').value;
+
+            if (!imageSrc) {
+                showModal('Görsel Eksik', 'Lütfen bir görsel yükleyin veya hazır örneklerden birini seçin!', false);
+                return;
+            }
+            if (!sentence) {
+                showModal('Cümle Eksik', 'Lütfen masal sayfası için temel bir cümle yazın!', false);
+                return;
+            }
+
+            // Show Loading Overlay
+            const overlay = document.getElementById('loading-overlay');
+            const progressBar = document.getElementById('loading-progress');
+            const stepTitle = document.getElementById('loading-step-title');
+            const stepDesc = document.getElementById('loading-step-desc');
+            overlay.classList.remove('hidden');
+            progressBar.style.width = '10%';
+
+            setTimeout(() => {
+                stepTitle.innerText = "Florence-2 Görsel Analizi Tamamlanıyor...";
+                stepDesc.innerText = "Görseldeki nesneler, kahramanlar ve ortam detayları çıkarıldı.";
+                progressBar.style.width = '45%';
+            }, 1000);
+
+            setTimeout(() => {
+                stepTitle.innerText = "Llama 3 Çocuk Dili Modeli Çalışıyor...";
+                stepDesc.innerText = `Cümleniz ${style === 'rhyme' ? 'kafiye ve şiirsel' : style === 'adventure' ? 'macera ve heyecan' : style === 'sleepy' ? 'huzurlu uyku' : 'eğitici'} tonuna uyarlanıyor...`;
+                progressBar.style.width = '85%';
+            }, 2200);
+
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 3000);
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                progressBar.style.width = '0%';
+
+                let enhancedText = "";
+                let visionAnalysis = "Sevimli ana karakter, renkli ve neşeli doğa ortamında eğlenceli bir an yaşıyor.";
+                
+                if (style === 'rhyme') {
+                    enhancedText = `Minik kahramanımız ${sentence.toLowerCase()} dedi,\nNeşeyle etrafa gülücükler saçtı.\nRengarenk dünyada masal başladı,\nMutlulukla herkes kanat açtı!`;
+                } else if (style === 'adventure') {
+                    enhancedText = `Heyecan doruktaydı! ${sentence} - Kahramanımız bilinmeyene doğru cesurca adım attı ve yeni gizemler keşfetmek için yola koyuldu!`;
+                } else if (style === 'sleepy') {
+                    enhancedText = `Yavaşça rüzgar esti, ${sentence.toLowerCase()}. Yıldızlar gökyüzünde parıldarken minik gözler kapanmaya, tatlı rüyalar başlamaya hazırlandı...`;
+                } else {
+                    enhancedText = `Biliyor musunuz? ${sentence} - Bu harika olay bize doğayı ve arkadaşlığı sevmenin ne kadar değerli olduğunu öğretti!`;
+                }
+
+                tempAiResult = {
+                    image: imageSrc,
+                    visionText: visionAnalysis,
+                    transformedText: enhancedText,
+                    style: document.getElementById('ai-style').options[document.getElementById('ai-style').selectedIndex].text,
+                    age: `${selectedAge} Yaş`
+                };
+
+                document.getElementById('result-img').src = imageSrc;
+                document.getElementById('result-vision-text').innerText = `"${visionAnalysis}"`;
+                document.getElementById('result-editable-text').value = enhancedText;
+                document.getElementById('result-meta-badge').innerText = `${tempAiResult.style} • ${tempAiResult.age}`;
+
+                switchTab('result');
+            }, 3500);
+        }
+
+        // Add Page to Book
+        function addPageToBook() {
+            const finalEditedText = document.getElementById('result-editable-text').value;
+            const newPage = {
+                id: Date.now(),
+                image: tempAiResult.image,
+                visionText: tempAiResult.visionText,
+                text: finalEditedText,
+                style: tempAiResult.style,
+                age: tempAiResult.age
+            };
+
+            bookPages.push(newPage);
+            updatePageCountBadge();
+            showModal('Harika!', 'Sayfa başarıyla kitabınıza eklendi! Çift Sayfa Kitap Görünümünden masalınızı okuyabilirsiniz.');
+            switchTab('manager');
+        }
+
+        function updatePageCountBadge() {
+            document.getElementById('page-count-badge').innerText = bookPages.length;
+        }
+
+        // Render Book Manager
+        function renderBookManager() {
+            const grid = document.getElementById('pages-grid');
+            const emptyState = document.getElementById('empty-book-state');
+            grid.innerHTML = '';
+
+            if (bookPages.length === 0) {
+                emptyState.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            bookPages.forEach((page, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-purple-50/60 rounded-2xl p-4 border border-purple-200/60 shadow-sm flex flex-col justify-between space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="bg-purple-600 text-white font-fredoka text-xs px-2.5 py-1 rounded-lg">Sayfa ${index + 1}</span>
+                        <div class="flex space-x-1">
+                            <button onclick="movePage(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="p-1.5 bg-white text-gray-600 rounded-lg hover:bg-purple-100 disabled:opacity-30 text-xs shadow-sm"><i class="fa-solid fa-arrow-up"></i></button>
+                            <button onclick="movePage(${index}, 1)" ${index === bookPages.length - 1 ? 'disabled' : ''} class="p-1.5 bg-white text-gray-600 rounded-lg hover:bg-purple-100 disabled:opacity-30 text-xs shadow-sm"><i class="fa-solid fa-arrow-down"></i></button>
+                            <button onclick="deletePage(${page.id})" class="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-xs shadow-sm"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <img src="${page.image}" class="w-full h-40 object-cover rounded-xl shadow-sm">
+                    <p class="text-xs text-gray-700 line-clamp-3 font-medium bg-white p-3 rounded-xl border border-purple-100">${page.text}</p>
+                    <div class="flex justify-between items-center text-[10px] text-gray-400 pt-1 border-t border-purple-100">
+                        <span>${page.style}</span>
+                        <span>${page.age}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function deletePage(id) {
+            bookPages = bookPages.filter(p => p.id !== id);
+            updatePageCountBadge();
+            renderBookManager();
+        }
+
+        function movePage(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= bookPages.length) return;
+            const temp = bookPages[index];
+            bookPages[index] = bookPages[newIndex];
+            bookPages[newIndex] = temp;
+            renderBookManager();
+        }
+
+        // Render Two-Page Real Book Spread (Flipbook)
+        function renderFlipbook() {
+            const container = document.getElementById('flipbook-content');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const indicator = document.getElementById('flip-page-indicator');
+
+            if (bookPages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 space-y-3">
+                        <i class="fa-solid fa-book-open text-4xl text-amber-400"></i>
+                        <p class="font-fredoka text-amber-900">Kitabınızda henüz sayfa yok. Lütfen "Sayfa Oluştur" sekmesinden yeni sayfalar ekleyin.</p>
+                    </div>
+                `;
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                indicator.innerText = "Sayfa 0 / 0";
+                return;
+            }
+
+            prevBtn.disabled = flipIndex === 0;
+            nextBtn.disabled = flipIndex === bookPages.length - 1;
+            indicator.innerText = `Sayfa ${flipIndex + 1} / ${bookPages.length}`;
+
+            const currentPage = bookPages[flipIndex];
+
+            // Render a real open book spread (Left Page: Image, Center: Spine/Binding, Right Page: Story Text)
+            container.innerHTML = `
+                <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-amber-200 relative min-h-[380px] page-turn">
+                    
+                    <!-- Left Page: Illustration -->
+                    <div class="p-6 md:p-8 bg-amber-50/30 flex flex-col justify-between items-center border-b md:border-b-0 md:border-r border-amber-200/60 relative">
+                        <span class="text-[10px] font-fredoka uppercase tracking-wider text-amber-800/50 mb-2">Sol Sayfa • Görsel</span>
+                        <div class="w-full h-64 md:h-80 rounded-2xl overflow-hidden shadow-md border-4 border-white bg-white flex items-center justify-center">
+                            <img src="${currentPage.image}" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-xs font-fredoka font-bold text-amber-800 mt-3">${flipIndex * 2 + 1}</span>
+                    </div>
+
+                    <!-- Book Center Spine Simulation -->
+                    <div class="hidden md:block absolute inset-y-0 left-1/2 -ml-3 w-6 z-10 pointer-events-none book-binding"></div>
+
+                    <!-- Right Page: Story Text -->
+                    <div class="p-6 md:p-10 bg-white flex flex-col justify-between items-center relative">
+                        <span class="text-[10px] font-fredoka uppercase tracking-wider text-amber-800/50 mb-2">Sağ Sayfa • Masal</span>
+                        <div class="w-full my-auto text-center space-y-4">
+                            <span class="bg-amber-100 text-amber-800 font-fredoka text-xs px-3 py-1 rounded-full inline-block mb-2">${currentPage.style}</span>
+                            <p class="font-fredoka text-lg md:text-xl text-gray-800 leading-relaxed whitespace-pre-line text-center">"${currentPage.text}"</p>
+                        </div>
+                        <span class="text-xs font-fredoka font-bold text-amber-800 mt-3">${flipIndex * 2 + 2}</span>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function prevFlipPage() {
+            if (flipIndex > 0) {
+                flipIndex--;
+                renderFlipbook();
+            }
+        }
+
+        function nextFlipPage() {
+            if (flipIndex < bookPages.length - 1) {
+                flipIndex++;
+                renderFlipbook();
+            }
+        }
+
+        // Render Complete Book View (Sequential Pages for Export/Print)
+        function renderPrintView() {
+            const container = document.getElementById('print-container');
+            container.innerHTML = '';
+
+            if (bookPages.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 bg-white rounded-3xl p-8 shadow-sm"><p class="text-gray-500 font-fredoka">Yazdırılacak veya indirilecek sayfa bulunmuyor.</p></div>`;
+                return;
+            }
+
+            // Cover Page
+            const coverSheet = document.createElement('div');
+            coverSheet.className = "bg-gradient-to-br from-purple-600 via-pink-600 to-amber-500 text-white rounded-3xl p-12 text-center shadow-2xl min-h-[400px] flex flex-col justify-between items-center relative overflow-hidden";
+            coverSheet.innerHTML = `
+                <div class="space-y-3">
+                    <span class="bg-white/20 backdrop-blur-md text-white font-fredoka text-xs px-4 py-1.5 rounded-full uppercase tracking-widest">Resimli Masal Kitabı</span>
+                    <h1 class="font-fredoka text-4xl md:text-5xl font-extrabold tracking-wide drop-shadow-md mt-4">Sihirli Masal Dünyam 🪄</h1>
+                </div>
+                <div class="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center my-6 backdrop-blur-md text-5xl">
+                    🦄
+                </div>
+                <div>
+                    <p class="font-fredoka text-sm opacity-90">MasalFabrikası Açık Kaynak AI İle Hazırlandı</p>
+                    <p class="text-xs opacity-75 mt-1">Özel Büyülü Baskı • ${new Date().getFullYear()}</p>
+                </div>
+            `;
+            container.appendChild(coverSheet);
+
+            // Sequential Book Spreads
+            bookPages.forEach((page, index) => {
+                const sheet = document.createElement('div');
+                sheet.className = "bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-purple-100 grid grid-cols-1 md:grid-cols-2 gap-8 items-center page-turn";
+                sheet.innerHTML = `
+                    <div class="w-full">
+                        <img src="${page.image}" class="w-full h-72 object-cover rounded-2xl shadow-md border-2 border-purple-50">
+                    </div>
+                    <div class="w-full space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="font-fredoka text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full">Bölüm ${index + 1}</span>
+                            <span class="text-xs text-gray-400 font-medium">${page.age}</span>
+                        </div>
+                        <p class="font-fredoka text-lg text-gray-800 leading-relaxed whitespace-pre-line">"${page.text}"</p>
+                    </div>
+                `;
+                container.appendChild(sheet);
+            });
+        }
+
+        // Export Entire Book as Standalone E-Book (.HTML File Download)
+        function downloadEBook() {
+            if (bookPages.length === 0) {
+                showModal('Uyarı', 'İndirmek için lütfen önce kitabınıza en az bir sayfa ekleyin.', false);
+                return;
+            }
+
+            // Build Standalone E-Book HTML
+            let pagesHtml = bookPages.map((page, idx) => `
+                <div style="background: white; border-radius: 20px; padding: 25px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                    <div style="flex: 1; min-width: 280px;">
+                        <img src="${page.image}" style="width: 100%; height: 280px; object-fit: cover; border-radius: 15px;">
+                    </div>
+                    <div style="flex: 1; min-width: 280px;">
+                        <span style="background: #F3E8FF; color: #7E22CE; font-size: 12px; font-weight: bold; padding: 4px 12px; border-radius: 20px;">Sayfa ${idx + 1}</span>
+                        <p style="font-size: 18px; line-height: 1.6; color: #2D3748; margin-top: 15px; font-family: 'Fredoka', sans-serif;">"${page.text}"</p>
+                    </div>
+                </div>
+            `).join('');
+
+            const ebookContent = `
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sihirli Masal Dünyam 🪄 - E-Kitap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Fredoka', sans-serif; background: #F8F0FF; margin: 0; padding: 20px; color: #333; }
+        .container { max-w: 800px; margin: 0 auto; }
+        .cover { background: linear-gradient(135deg, #9333EA, #EC4899, #F59E0B); color: white; text-align: center; padding: 50px 20px; border-radius: 25px; margin-bottom: 40px; }
+        .cover h1 { font-size: 38px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cover">
+            <h1>Sihirli Masal Dünyam 🪄</h1>
+            <p>MasalFabrikası Açık Kaynak AI Tarafından Oluşturulmuştur</p>
+        </div>
+        ${pagesHtml}
+    </div>
+</body>
+</html>
+            `;
+
+            // Trigger Download
+            const blob = new Blob([ebookContent], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "masal_kitabim.html");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showModal('E-Kitap İndirildi!', 'Masal kitabınız HTML e-Kitap olarak indirildi. Dosyayı tarayıcınızda açıp dilediğiniz an okuyabilirsiniz.');
+        }
+    </script>
+</body>
+</html>
